@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-export default function FolderList({ folders, onCreate }) {
+export default function FolderList({ folders, onOpen, onCreate }) {
   const [name, setName] = useState('')
 
   const handleCreate = () => {
@@ -10,20 +10,33 @@ export default function FolderList({ folders, onCreate }) {
   }
 
   return (
-    <div style={{ marginBottom: '20px' }}>
-      <input
-        value={name}
-        placeholder="New folder"
-        onChange={e => setName(e.target.value)}
-      />
-      <button onClick={handleCreate}>Create Folder</button>
+    <div>
+      <h2>📁 Папки</h2>
 
-      <h2>Folders</h2>
-      <ul>
+      <div style={{ marginBottom: 10 }}>
+        <input
+          value={name}
+          placeholder="Новая папка"
+          onChange={e => setName(e.target.value)}
+        />
+        <button onClick={handleCreate}>Создать</button>
+      </div>
+
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
         {folders.map(f => (
-          <li key={f}>{f}</li>
+          <div
+            key={f}
+            onClick={() => onOpen(f)}
+            style={{
+              padding: 10,
+              border: '1px solid #ccc',
+              cursor: 'pointer'
+            }}
+          >
+            📁 {f}
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   )
 }
