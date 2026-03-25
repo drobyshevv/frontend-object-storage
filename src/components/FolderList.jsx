@@ -1,42 +1,46 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 
-export default function FolderList({ folders, onOpen, onCreate }) {
-  const [name, setName] = useState('')
+export default function FolderList({ folders, onOpen, onDelete, onCreate }) {
+  const [name, setName] = useState("")
+  const [showInput, setShowInput] = useState(false)
 
   const handleCreate = () => {
     if (!name) return
     onCreate(name)
-    setName('')
+    setName("")
+    setShowInput(false)
   }
 
   return (
-    <div>
-      <h2>📁 Папки</h2>
+    <div className="folder-list">
+      <h3>📁 Папки</h3>
 
-      <div style={{ marginBottom: 10 }}>
-        <input
-          value={name}
-          placeholder="Новая папка"
-          onChange={e => setName(e.target.value)}
-        />
-        <button onClick={handleCreate}>Создать</button>
+      <div className="folder-controls">
+        {showInput ? (
+          <>
+            <input
+              type="text"
+              placeholder="Имя новой папки"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+            />
+            <button onClick={handleCreate}>Создать</button>
+            <button onClick={() => setShowInput(false)}>Отмена</button>
+          </>
+        ) : (
+          <button onClick={() => setShowInput(true)}>Создать папку</button>
+        )}
       </div>
 
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-        {folders.map(f => (
-          <div
-            key={f}
-            onClick={() => onOpen(f)}
-            style={{
-              padding: 10,
-              border: '1px solid #ccc',
-              cursor: 'pointer'
-            }}
-          >
-            📁 {f}
-          </div>
+      <ul>
+        {folders.map((f) => (
+          <li key={f}>
+            <span className="folder-name" onClick={() => onOpen(f)}>📂 {f}</span>
+            <button className="delete-folder" onClick={() => onDelete(f)}>❌</button>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   )
 }

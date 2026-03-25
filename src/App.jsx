@@ -1,78 +1,83 @@
 import React, { useEffect, useState } from 'react'
-import { fetchFiles, uploadFile, downloadFile, deleteFile, createFolder } from './api/api'
-import UploadForm from './components/UploadForm.jsx'
-import FileList from './components/FileList.jsx'
-import FolderList from './components/FolderList.jsx'
+import { fetchFiles, uploadFile, downloadFile, deleteFile } from './api/api'
+import UploadForm from './components/UploadForm'
+import FileList from './components/FileList'
+import FolderList from './components/FolderList'
+import Breadcrumbs from './components/Breadcrumbs'
 
 export default function App() {
   const [files, setFiles] = useState([])
   const [folders, setFolders] = useState([])
   const [currentFolder, setCurrentFolder] = useState('')
 
-  const loadFiles = async (folder = '') => {
-    try {
-      const data = await fetchFiles(folder)
+  const load = async (folder = '') => {
+    const data = await fetchFiles(folder)
+    setFiles(data || [])
 
-      setFiles(data || [])
-
-
-      if (!folder) {
-        const uniqueFolders = [...new Set(data.map(f => f.Folder).filter(Boolean))]
-        setFolders(uniqueFolders)
-      }
-
-    } catch (e) {
-      console.error(e)
-      setFiles([])
+    if (!folder) {
+      const unique = [...new Set(data.map(f => f.Folder).filter(Boolean))]
+      setFolders(unique)
     }
   }
 
-  useEffect(() => {
-    loadFiles()
-  }, [])
+  useEffect(() => { load() }, [])
 
-  const openFolder = (folder) => {
-    setCurrentFolder(folder)
-    loadFiles(folder)
+  const openFolder = (f) => {
+    setCurrentFolder(f)
+    load(f)
   }
 
   const goBack = () => {
     setCurrentFolder('')
-    loadFiles('')
+    load('')
   }
 
   const handleUpload = async (file, folder) => {
-    await uploadFile(file, folder || currentFolder)
-    loadFiles(currentFolder)
+    await uploadFile(file, folder)
+    load(folder)
   }
 
-  const handleDelete = async (id) => {
+  const handleDeleteFile = async (id) => {
     await deleteFile(id)
-    loadFiles(currentFolder)
+    load(currentFolder)
+  }
+
+  const handleDeleteFolder = async (folder) => {
+    const filesInFolder = files.filter(f => f.Folder === folder)
+    for (let f of filesInFolder) {
+      await deleteFile(f.ID)
+    }
+    load('')
+  }
+
+  const handleCreateFolder = async (folderName) => {
+
+    const placeholder = new File([], ".keep")
+    await handleUpload(placeholder, folderName)
+    setFolders(prev => [...prev, folderName])
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Object Storage</h1>
+    <div className="container">
+      <h1>☁️ Object Storage</h1>
 
-      {currentFolder && (
-        <button onClick={goBack}>⬅ Назад</button>
-      )}
+      <Breadcrumbs currentFolder={currentFolder} onBack={goBack} />
 
-    <UploadForm
-        onUpload={handleUpload}
-        folders={folders}
-        currentFolder={currentFolder}
-    />
+      <UploadForm onUpload={handleUpload} currentFolder={currentFolder} />
 
       {!currentFolder && (
-        <FolderList folders={folders} onOpen={openFolder} onCreate={createFolder} />
+        <FolderList
+          folders={folders}
+          onOpen={openFolder}
+          onDelete={handleDeleteFolder}
+          onCreate={handleCreateFolder}
+        />
       )}
 
       <FileList
         files={files.filter(f => f.Folder === currentFolder)}
         onDownload={downloadFile}
-        onDelete={handleDelete}
+        onDelete={handleDeleteFile}
       />
     </div>
   )

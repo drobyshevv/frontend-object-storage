@@ -1,47 +1,35 @@
-import React, { useState } from 'react'
+import React, { useRef } from 'react'
 
-export default function UploadForm({ onUpload, folders = [], currentFolder }) {
-  const [file, setFile] = useState(null)
-  const [selectedFolder, setSelectedFolder] = useState('')
+export default function UploadForm({ onUpload, currentFolder }) {
+  const inputRef = useRef()
 
-  const handleUpload = () => {
-    if (!file) return alert('Выбери файл')
-
-    // если мы внутри папки — грузим туда
-    const folderToUse = currentFolder || selectedFolder
-
-    onUpload(file, folderToUse)
-
-    setFile(null)
-    setSelectedFolder('')
+  const handleFiles = (files) => {
+    const file = files[0]
+    if (!file) return
+    onUpload(file, currentFolder)
   }
 
   return (
-    <div style={{ marginBottom: 20 }}>
-      <h3>📤 Загрузка файла</h3>
+    <div
+      className="dropzone"
+      onDragOver={e => e.preventDefault()}
+      onDrop={e => {
+        e.preventDefault()
+        handleFiles(e.dataTransfer.files)
+      }}
+    >
+      <p>Перетащи файл сюда или</p>
 
-      {/* выбор файла */}
+      <button onClick={() => inputRef.current.click()}>
+        📤 Загрузить файл
+      </button>
+
       <input
         type="file"
-        onChange={e => setFile(e.target.files[0])}
+        hidden
+        ref={inputRef}
+        onChange={e => handleFiles(e.target.files)}
       />
-
-      {/* dropdown ТОЛЬКО если мы в root */}
-      {!currentFolder && (
-        <select
-          value={selectedFolder}
-          onChange={e => setSelectedFolder(e.target.value)}
-        >
-          <option value="">Корень</option>
-          {folders.map(f => (
-            <option key={f} value={f}>{f}</option>
-          ))}
-        </select>
-      )}
-
-      <button onClick={handleUpload}>
-        Загрузить файл
-      </button>
     </div>
   )
 }
