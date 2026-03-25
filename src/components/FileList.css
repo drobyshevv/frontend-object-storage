@@ -1,0 +1,56 @@
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 20px;
+}
+
+.file-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  overflow: hidden;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.file-card:hover {
+  transform: translateY(-3px);
+}
+
+.file-preview {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ecf0f1;
+}
+
+.file-img {
+  max-width: 80px;
+  max-height: 80px;
+  object-fit: contain;
+}
+
+.file-actions {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 10px;
+}
+
+.file-actions button {
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.file-actions button:first-child {
+  background: #4a90e2;
+  color: #fff;
+}
+
+.file-actions button:last-child {
+  background: #e74c3c;
+  color: #fff;
+}

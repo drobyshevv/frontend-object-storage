@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react'
 import { fetchFiles, uploadFile, downloadFile, deleteFile } from './api/api'
 import UploadForm from './components/UploadForm'
@@ -51,15 +52,14 @@ export default function App() {
   }
 
   const handleCreateFolder = async (folderName) => {
-
     const placeholder = new File([], ".keep")
     await handleUpload(placeholder, folderName)
-    setFolders(prev => [...prev, folderName])
+    load('')
   }
 
   return (
     <div className="container">
-      <h1>☁️ Object Storage</h1>
+      <h1 className="title">Object Storage</h1>
 
       <Breadcrumbs currentFolder={currentFolder} onBack={goBack} />
 
@@ -68,6 +68,7 @@ export default function App() {
       {!currentFolder && (
         <FolderList
           folders={folders}
+          files={files}
           onOpen={openFolder}
           onDelete={handleDeleteFolder}
           onCreate={handleCreateFolder}
@@ -76,8 +77,10 @@ export default function App() {
 
       <FileList
         files={files.filter(f => f.Folder === currentFolder)}
+        currentFolder={currentFolder}
         onDownload={downloadFile}
-        onDelete={handleDeleteFile}
+        onDeleteFile={handleDeleteFile}
+        onDeleteFolder={handleDeleteFolder}
       />
     </div>
   )

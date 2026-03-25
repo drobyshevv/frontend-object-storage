@@ -1,0 +1,17 @@
+.breadcrumbs {
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.breadcrumb {
+  cursor: pointer;
+  color: #1890ff;
+}
+
+.breadcrumb-sep {
+  margin: 0 5px;
+}
+
+.breadcrumb-current {
+  color: #333;
+}
